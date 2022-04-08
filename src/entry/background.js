@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
       sendResponse(cookies);
     });
   }
-  return true;    // Need this to avoid 'message port closed' error
+  return true; // Need this to avoid 'message port closed' error
 });
 
 chrome.cookies.onChanged.addListener((changeInfo) => {
