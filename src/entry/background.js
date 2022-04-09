@@ -55,6 +55,39 @@ const insertCookieIntoStorage = function (cookie) {
   }
 };
 
+const clearCookies = function () {
+  // First we delete the cookies from the browser
+  var removeCookie = function (cookie) {
+    var url =
+      "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path;
+    chrome.cookies.remove({ url: url, name: cookie.name });
+  };
+
+  chrome.cookies.getAll({}, function (all_cookies) {
+    var count = all_cookies.length;
+    for (var i = 0; i < count; i++) {
+      removeCookie(all_cookies[i]);
+    }
+  });
+
+  // Second, we also clear the historyDB
+  if (historyDB !== undefined) {
+    return new Promise((resolve) => {
+      let trans = historyDB.transaction(["cookies"], "readwrite");
+      trans.oncomplete = () => {
+        resolve();
+      };
+
+      let store = trans.objectStore("cookies");
+      store.clear();
+    });
+  } else {
+    console.error(
+      "Could not clear cookies because database connection is closed!"
+    );
+  }
+};
+
 const getCookiesFromStorage = async function () {
   if (historyDB !== undefined) {
     return new Promise((resolve) => {
@@ -87,6 +120,11 @@ chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
     getCookiesFromStorage().then((cookies) => {
       console.log(`sending cookies to frontend: ${cookies}`);
       sendResponse(cookies);
+    });
+  } else if (request === "clear_cookies") {
+    console.log("clearing cookies...");
+    clearCookies().then((res) => {
+      sendResponse(res);
     });
   }
   return true; // Need this to avoid 'message port closed' error

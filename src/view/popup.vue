@@ -19,7 +19,10 @@
       </table>
       <ul></ul>
     </div>
-    <button @click="refreshCookies">Refresh</button>
+    <button class="btn btn-primary" @click="refreshCookies">Refresh</button>
+    <button class="btn btn-danger" @click="deleteCookies">
+      Delete Cookies
+    </button>
   </div>
 </template>
 
@@ -33,12 +36,22 @@ export default {
   },
   methods: {
     refreshCookies() {
+      /*
+       * TODO: Automate. The only way push changes to the frontend automatically would probably be
+       * to add a listener or call this function every 2 seconds (thanks manifest v3)
+       */
       const self = this; // We don't have access to 'this' in sendMessage()
       console.log("refreshing cookies...");
       chrome.runtime.sendMessage("get_cookies", function (response) {
         console.log(`received ${response.length} cookies`);
         self.cookies = response;
-        console.log(self.cookies[0]);
+      });
+    },
+    deleteCookies() {
+      const self = this;
+      chrome.runtime.sendMessage("clear_cookies", function (response) {
+        console.log(response);
+        self.refreshCookies();
       });
     },
   },
