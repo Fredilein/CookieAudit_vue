@@ -1,6 +1,6 @@
 <template>
   <div class="main_app">
-    <h1>Sup</h1>
+    <h1>CookieAudit</h1>
     <code>{{ cookies.length }} Cookies</code>
     <div v-if="cookies.length > 0">
       <table class="table">
@@ -45,6 +45,7 @@ export default {
       chrome.runtime.sendMessage("get_cookies", function (response) {
         console.log(`received ${response.length} cookies`);
         self.cookies = response;
+        console.log(self.cookies[0]);
       });
     },
     deleteCookies() {

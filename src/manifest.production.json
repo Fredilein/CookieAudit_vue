@@ -4,15 +4,23 @@
   "description": "VueJS chrome extension",
   "version": "0.0.1",
   "background": {
-    "service_worker": "/background.js"
+    "service_worker": "/background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["/content.js"]
+      "matches": ["https://*/*"],
+      "run_at": "document_start",
+      "js": ["inject.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [ "extractor.js", "difflib.js", "levenshtein.js" ],
+      "matches": [ "https://*/*" ]
     }
   ],
   "permissions": [
